@@ -1057,16 +1057,9 @@ export default function App() {
     });
   };
 
-  // Format date to Indian time with AM/PM
-  const formatIndianTime = (date) => {
-    return new Date(date).toLocaleString('en-IN', {
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true,
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    });
+  // Handle review dialog open
+  const handleReviewDialogOpen = () => {
+    setReviewFormOpen(true);
   };
 
   // Add review dialog component
