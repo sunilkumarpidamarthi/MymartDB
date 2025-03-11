@@ -4,12 +4,15 @@
   "description": "Indian Grocery E-commerce Application",
   "main": "server.js",
   "engines": {
-    "node": "18.x"
+    "node": "18.x",
+    "npm": "9.x"
   },
   "scripts": {
     "start": "node server.js",
     "client": "cd client && npm start",
-    "build": "cd client && npm install && npm run build",
+    "install-client": "cd client && npm install",
+    "build-client": "cd client && npm run build",
+    "build": "npm run install-client && npm run build-client",
     "vercel-build": "npm install && npm run build",
     "dev": "concurrently \"npm run start\" \"npm run client\""
   },
@@ -22,7 +25,8 @@
     "mongoose": "^7.8.6",
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^3.3.2",
-    "nodemailer": "^6.10.0"
+    "nodemailer": "^6.10.0",
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "concurrently": "^8.2.1"
