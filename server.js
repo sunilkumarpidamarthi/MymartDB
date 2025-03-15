@@ -326,7 +326,7 @@ const Product = mongoose.model('Product', productSchema);
  */
 
 // Get all products
-app.get('https://sunilmart1.vercel.app/api/products', async (req, res) => {
+app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find();
     const productsWithImageUrls = products.map(product => ({
@@ -340,7 +340,7 @@ app.get('https://sunilmart1.vercel.app/api/products', async (req, res) => {
 });
 
 // Search products
-app.get('https://sunilmart1.vercel.app/api/products/search', async (req, res) => {
+app.get('/api/products/search', async (req, res) => {
   try {
     const searchQuery = req.query.q;
     const products = await Product.find({
@@ -361,7 +361,7 @@ app.get('https://sunilmart1.vercel.app/api/products/search', async (req, res) =>
 });
 
 // Get products by category
-app.get('https://sunilmart1.vercel.app/api/products/category/:category', async (req, res) => {
+app.get('/api/products/category/:category', async (req, res) => {
   try {
     const category = req.params.category;
     const products = await Product.find({ category });
@@ -376,7 +376,7 @@ app.get('https://sunilmart1.vercel.app/api/products/category/:category', async (
 });
 
 // API endpoint to add a product with image upload
-app.post('https://sunilmart1.vercel.app/api/products', upload.single('image'), async (req, res) => {
+app.post('/api/products', upload.single('image'), async (req, res) => {
   try {
     const { name, category, price, quantity, description } = req.body;
     
@@ -402,7 +402,7 @@ app.post('https://sunilmart1.vercel.app/api/products', upload.single('image'), a
 });
 
 // Create new order with better error handling
-app.post('https://sunilmart1.vercel.app/api/orders', async (req, res) => {
+app.post('/api/orders', async (req, res) => {
   console.log('Received order request:', req.body);
   
   try {
@@ -449,7 +449,7 @@ app.post('https://sunilmart1.vercel.app/api/orders', async (req, res) => {
 });
 
 // Reviews API endpoints
-app.get('https://sunilmart1.vercel.app/api/reviews', async (req, res) => {
+app.get('/api/reviews', async (req, res) => {
   try {
     const reviews = await Review.find().sort({ date: -1 });
     console.log('Fetched reviews:', reviews);
@@ -489,7 +489,7 @@ app.get('https://sunilmart1.vercel.app/api/reviews', async (req, res) => {
   }
 });
 
-app.post('https://sunilmart1.vercel.app/api/reviews', async (req, res) => {
+app.post('/api/reviews', async (req, res) => {
   try {
     const { userName, rating, comment } = req.body;
     
@@ -514,7 +514,7 @@ app.post('https://sunilmart1.vercel.app/api/reviews', async (req, res) => {
 });
 
 // Get all reviews
-app.get('https://sunilmart1.vercel.app/api/reviews', async (req, res) => {
+app.get('/api/reviews', async (req, res) => {
   try {
     const reviews = await Review.find().sort({ timestamp: -1 }); // Get latest reviews first
     console.log('Reviews fetched successfully:', reviews.length);
@@ -529,7 +529,7 @@ app.get('https://sunilmart1.vercel.app/api/reviews', async (req, res) => {
 });
 
 // Add new review
-app.post('https://sunilmart1.vercel.app/api/reviews', async (req, res) => {
+app.post('/api/reviews', async (req, res) => {
   try {
     const { userName, text } = req.body;
     
@@ -581,7 +581,7 @@ const sampleReviews = [
 ];
 
 // Initialize reviews data
-app.post('https://sunilmart1.vercel.app/api/initialize-reviews', async (req, res) => {
+app.post('/api/initialize-reviews', async (req, res) => {
   try {
     // Clear existing reviews
     await Review.deleteMany({});
@@ -598,7 +598,7 @@ app.post('https://sunilmart1.vercel.app/api/initialize-reviews', async (req, res
 });
 
 // Initialize sample data with local images
-app.post('https://sunilmart1.vercel.app/api/initialize-data', async (req, res) => {
+app.post('/api/initialize-data', async (req, res) => {
   try {
     // Clear existing products
     await Product.deleteMany({});
@@ -688,7 +688,7 @@ app.post('https://sunilmart1.vercel.app/api/initialize-data', async (req, res) =
 });
 
 // API endpoint to get sales analytics
-app.get('https://sunilmart1.vercel.app/api/sales/analytics', async (req, res) => {
+app.get('/api/sales/analytics', async (req, res) => {
   try {
     // Get all orders
     const orders = await Order.find({});
@@ -849,7 +849,7 @@ function findAssociationRules(orders, minSupport, minConfidence) {
 }
 
 // Get frequent product combinations
-app.get('https://sunilmart1.vercel.app/api/sales/patterns', async (req, res) => {
+app.get('/api/sales/patterns', async (req, res) => {
   try {
     const orders = await Order.find({});
     
