@@ -1057,11 +1057,6 @@ export default function App() {
     });
   };
 
-  // Handle review dialog open
-  const handleReviewDialogOpen = () => {
-    setReviewFormOpen(true);
-  };
-
   // Add review dialog component
   const renderReviewDialog = () => (
     <Dialog 
