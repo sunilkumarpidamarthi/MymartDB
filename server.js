@@ -20,7 +20,6 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'build')));
 
 // MongoDB Connection with better error handling
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/martdb', {
@@ -32,6 +31,12 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/martdb', 
 }).catch((error) => {
   console.error('MongoDB connection error:', error);
 });
+
+// Serve static files from the React app
+app.use(express.static('client/build'));
+
+// Serve images
+app.use('/images', express.static(path.join(__dirname, 'client/public/images')));
 
 // Monitor MongoDB connection
 mongoose.connection.on('connected', () => {
@@ -80,9 +85,6 @@ const upload = multer({
     }
   }
 });
-
-// Serve static files from the public directory
-app.use('/images', express.static(path.join(__dirname, 'client/public/images')));
 
 // Error handling middleware - move to top level
 app.use((err, req, res, next) => {
@@ -892,12 +894,9 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'build')));
-
 // Handle React routing, return all requests to React app
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
