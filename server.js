@@ -32,8 +32,15 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/martdb', 
   console.error('MongoDB connection error:', error);
 });
 
+// Determine the build path based on environment
+const buildPath = process.env.NODE_ENV === 'production' 
+  ? path.join(__dirname, 'client/build')  // Vercel production build path
+  : path.join(__dirname, 'client', 'build'); // Local development build path
+
+console.log('Build path:', buildPath);
+
 // Serve static files from the client's build directory
-app.use(express.static(path.join(__dirname, 'client/build')));
+app.use(express.static(buildPath));
 
 // Serve product images
 app.use('/images', express.static(path.join(__dirname, 'client/public/images')));
@@ -897,7 +904,8 @@ app.use((req, res) => {
 // All other GET requests not handled before will return React app
 app.get('*', (req, res) => {
   console.log('Serving React app for path:', req.path);
-  res.sendFile(path.join(__dirname, 'client/build/index.html'));
+  console.log('Build directory:', buildPath);
+  res.sendFile(path.join(buildPath, 'index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
