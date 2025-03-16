@@ -892,23 +892,15 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// Start server
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, async () => {
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, 'build')));
+
+// Handle React routing, return all requests to React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  
-  // Initialize sample data if no products exist
-  try {
-    const existingProducts = await Product.countDocuments();
-    if (existingProducts === 0) {
-      const response = await fetch(`http://localhost:${PORT}/api/initialize-data`, {
-        method: 'POST'
-      });
-      if (response.ok) {
-        console.log('Sample data initialized successfully');
-      }
-    }
-  } catch (error) {
-    console.error('Error checking/initializing sample data:', error);
-  }
 });

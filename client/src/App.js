@@ -89,7 +89,9 @@ const theme = createTheme({
 const categories = ['All', 'Dals', 'Dairy', 'Oils', 'Atta & Flours', 'Masala', 'Soaps/Detergents', 'Biscuits', 'Cold Drinks','Snacks'];
 
 // API URL constant
-const API_URL = 'https://sunilmart1.vercel.app';
+const API_URL = process.env.NODE_ENV === 'production' 
+  ? '' // Empty string for same-origin requests in production
+  : 'http://localhost:5000'; // Development server
 
 // Sample products data
 const sampleProducts = [
