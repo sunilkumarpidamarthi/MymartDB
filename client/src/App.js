@@ -1279,6 +1279,7 @@ export default function App() {
             <DialogContent sx={{ p: 4 }}>
               <CartDialog>
                 {/* User Details Form */}
+                {/* User Details Form */}
                 <Box sx={{ mb: 4 }}>
                   <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>
                     Delivery Details
