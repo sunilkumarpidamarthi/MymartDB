@@ -205,6 +205,7 @@ export const MarqueeText = styled(Typography)(({ theme }) => ({
 
 // Cart dialog styling
 export const CartDialog = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
   '& .cart-item': {
     display: 'flex',
     gap: '3rem',

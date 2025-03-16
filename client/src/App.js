@@ -65,9 +65,9 @@ import {
   StyledAppBar,
   ProductCard,
   ReviewsContainer,
-  CartDialog,
   OfferBanner,
-  MarqueeText
+  MarqueeText,
+  CartDialog
 } from './styles';
 
 // Create Material-UI theme
@@ -405,7 +405,6 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('All'); // Selected category
   const [reviews, setReviews] = useState([]); // All reviews
   const [visibleReviews, setVisibleReviews] = useState([]); // Currently visible reviews
-  const [currentReviewIndex, setCurrentReviewIndex] = useState(0); // Index of current review
   const [reviewFormOpen, setReviewFormOpen] = useState(false);
   const [newReview, setNewReview] = useState({
     userName: '',
@@ -457,7 +456,6 @@ export default function App() {
         if (Array.isArray(data) && data.length > 0) {
           setReviews(data);
           setVisibleReviews([data[0]]);
-          setCurrentReviewIndex(0);
         }
       } catch (error) {
         console.error('Error fetching reviews:', error);
@@ -477,10 +475,10 @@ export default function App() {
     if (!Array.isArray(reviews) || reviews.length === 0) return;
 
     const interval = setInterval(() => {
-      setCurrentReviewIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % reviews.length;
-        setVisibleReviews([reviews[nextIndex]]);
-        return nextIndex;
+      setVisibleReviews(prevVisible => {
+        const currentIndex = reviews.findIndex(r => r === prevVisible[0]);
+        const nextIndex = (currentIndex + 1) % reviews.length;
+        return [reviews[nextIndex]];
       });
     }, 5000);
 
@@ -1091,8 +1089,8 @@ export default function App() {
             <Box className="top-bar">
               <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'white',fontSize:'2.5rem', }}>
                 Sunil's Mart
-              </Typography>
-              
+          </Typography>
+          
               <Box className="search-container">
                 <Paper
                   sx={{
@@ -1104,7 +1102,7 @@ export default function App() {
                   }}
                 >
                   <InputBase
-                    placeholder="Search products..."
+            placeholder="Search products..."
                     value={searchTerm}
                     onChange={handleSearchChange}
                     sx={{ ml: 2, flex: 1, fontSize: '2rem' }}
@@ -1141,8 +1139,8 @@ export default function App() {
                 >
                   <Badge badgeContent={cart.length} color="error">
                     <ShoppingCartIcon sx={{ fontSize: 40 }} />
-                  </Badge>
-                </IconButton>
+            </Badge>
+          </IconButton>
                 <IconButton 
                   color="inherit" 
                   onClick={() => {
@@ -1201,29 +1199,31 @@ export default function App() {
           </OfferBanner>
 
           {/* Products Grid */}
-          <Grid container spacing={4}>
+        <Grid container spacing={4}>
             {products.map((product) => (
               <Grid item xs={12} sm={6} md={4} lg={2.4} key={product._id}>
                 <ProductCard>
-                  <CardMedia
-                    component="img"
-                    image={product.image}
-                    alt={product.name}
-                  />
-                  <CardContent>
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={product.image}
+                  alt={product.name}
+                />
+                <CardContent>
                     <Typography variant="h5" gutterBottom sx={{ fontSize: '1.8rem', fontWeight: 'bold' }}>
-                      {product.name}
-                    </Typography>
+                    {product.name}
+                  </Typography>
                     <Typography variant="body1" color="text.secondary" sx={{ mb: 2, fontSize: '1.2rem' }}>
-                      {product.description}
-                    </Typography>
+                    {product.description}
+                  </Typography>
                     <Typography variant="h5" color="primary" fontWeight="bold" sx={{ fontSize: '1.8rem' }}>
                       ₹{product.price}
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button
-                      variant="contained"
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button 
+                    size="large" 
+                    variant="contained"
                       fullWidth
                       onClick={() => handleAddToCart(product)}
                       startIcon={<AddShoppingCartIcon />}
@@ -1235,12 +1235,12 @@ export default function App() {
                       }}
                     >
                       Add 
-                    </Button>
-                  </CardActions>
+                  </Button>
+                </CardActions>
                 </ProductCard>
-              </Grid>
-            ))}
-          </Grid>
+            </Grid>
+          ))}
+        </Grid>
 
           {/* Reviews Section */}
           <ReviewsSection />
@@ -1326,7 +1326,7 @@ export default function App() {
                     {userDetailsError && (
                       <Typography color="error" variant="body2">
                         {userDetailsError}
-                      </Typography>
+              </Typography>
                     )}
                   </Box>
                 </Box>
@@ -1344,7 +1344,7 @@ export default function App() {
                       </Typography>
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                         <Typography variant="body1" color="text.secondary" sx={{ fontSize: '1.3rem' }}>
-                          Quantity:
+                  Quantity: 
                         </Typography>
                         <Select
                           value={item.quantity}
@@ -1358,14 +1358,14 @@ export default function App() {
                             </MenuItem>
                           ))}
                         </Select>
-                        <Button
+                <Button 
                           onClick={() => handleRemoveFromCart(item.name)}
-                          color="error"
+                        color="error"
                           startIcon={<DeleteIcon />}
                           sx={{ ml: 2, fontSize: '1.2rem' }}
-                        >
-                          Remove
-                        </Button>
+                >
+                  Remove
+                </Button>
                       </Box>
                       <Typography variant="h6" color="primary" fontWeight="bold" sx={{ fontSize: '1.4rem' }}>
                         ₹{item.price * item.quantity}
@@ -1377,7 +1377,7 @@ export default function App() {
                 <Box className="total-section">
                   <Typography variant="h4" sx={{ mb: 3 }}>
                     Total: ₹{cart.reduce((sum, item) => sum + item.price * item.quantity, 0)}
-                  </Typography>
+              </Typography>
                   <Button
                     variant="contained"
                     color="primary"
@@ -1394,6 +1394,12 @@ export default function App() {
                 </Box>
               </CartDialog>
             </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setCartOpen(false)}>Close</Button>
+              <Button variant="contained" color="primary">
+                Checkout
+              </Button>
+            </DialogActions>
           </Dialog>
 
           {renderAnalytics()}
