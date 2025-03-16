@@ -955,16 +955,22 @@ export default function App() {
     );
   };
 
-  // Handle review submission
-  const handleReviewSubmit = async (e) => {
-    e.preventDefault();
+  // Handle submitting a new review
+  const handleSubmitReview = async () => {
+    if (!newReview.userName || !newReview.rating || !newReview.comment) {
+      toast.error('Please fill in all review fields', {
+        icon: '❌'
+      });
+      return;
+    }
+
     try {
       const response = await fetch(`${API_URL}/api/reviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newReview),
+        body: JSON.stringify(newReview)
       });
 
       if (!response.ok) {
@@ -972,19 +978,15 @@ export default function App() {
       }
 
       const savedReview = await response.json();
-      console.log('Saved review:', savedReview);
-      
-      // Update reviews state
-      setReviews(prev => [savedReview, ...prev]);
-      setVisibleReviews([savedReview]);
-      setCurrentReviewIndex(0);
-      
-      // Reset form
+      setReviews(prevReviews => [...prevReviews, savedReview]);
       setReviewFormOpen(false);
-      setNewReview({ userName: '', rating: 5, comment: '' });
-      
+      setNewReview({
+        userName: '',
+        rating: 5,
+        comment: ''
+      });
       toast.success('Review submitted successfully!', {
-        icon: '⭐'
+        icon: '✨'
       });
     } catch (error) {
       console.error('Error submitting review:', error);
@@ -994,60 +996,82 @@ export default function App() {
     }
   };
 
-  // Render reviews section
-  const renderReviews = () => (
+  // Dialog for writing reviews
+  const ReviewDialog = () => (
+    <Dialog open={reviewFormOpen} onClose={() => setReviewFormOpen(false)}>
+      <DialogTitle>Write a Review</DialogTitle>
+      <DialogContent>
+        <TextField
+          autoFocus
+          margin="dense"
+          label="Your Name"
+          fullWidth
+          value={newReview.userName}
+          onChange={(e) => setNewReview({ ...newReview, userName: e.target.value })}
+        />
+        <Box sx={{ mt: 2 }}>
+          <Typography>Rating</Typography>
+          <Select
+            value={newReview.rating}
+            onChange={(e) => setNewReview({ ...newReview, rating: e.target.value })}
+            fullWidth
+          >
+            {[1, 2, 3, 4, 5].map((rating) => (
+              <MenuItem key={rating} value={rating}>
+                {'⭐'.repeat(rating)}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+        <TextField
+          margin="dense"
+          label="Your Review"
+          fullWidth
+          multiline
+          rows={4}
+          value={newReview.comment}
+          onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setReviewFormOpen(false)}>Cancel</Button>
+        <Button onClick={handleSubmitReview} variant="contained" color="primary">
+          Submit Review
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+
+  // Display reviews
+  const ReviewsSection = () => (
     <ReviewsContainer>
-      <Box className="review-header">
-        <Typography variant="h3" gutterBottom sx={{ fontWeight: 'bold' }}>
-          Customer Reviews
-        </Typography>
-        <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-          What our customers say about us
-        </Typography>
-      </Box>
-      <Box className="reviews-list">
-        {Array.isArray(visibleReviews) && visibleReviews.length > 0 ? (
-          visibleReviews.map((review, index) => (
-            <Box 
-              key={review._id || index} 
-              className={`review-card ${index === 0 ? 'visible' : ''}`}
-            >
-              <Typography variant="h5" sx={{ mb: 2, fontStyle: 'italic', fontSize: '1.8rem' }}>
-                "{review.comment}"
-              </Typography>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>
-                <Box>
-                  <Typography variant="h6" color="primary" fontWeight="bold" sx={{ fontSize: '1.4rem' }}>
-                    {review.userName}
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-                    <Typography variant="subtitle1" color="text.secondary" sx={{ fontSize: '1.2rem' }}>
-                      Rating: {review.rating}/5
-                    </Typography>
-                    <Typography variant="subtitle1" color="text.secondary" sx={{ fontSize: '1.2rem', ml: 2 }}>
-                      {new Date(review.date).toLocaleDateString()}
-                    </Typography>
-                  </Box>
-                </Box>
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: 1,
-                  color: '#2e7d32'
-                }}>
-                  <Typography sx={{ fontSize: '1.2rem' }}>
-                    Review {currentReviewIndex + 1} of {reviews.length}
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-          ))
-        ) : (
-          <Typography variant="h6" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
-            No reviews yet. Be the first to write a review!
+      {visibleReviews.map((review, index) => (
+        <Paper 
+          key={index} 
+          elevation={3}
+          sx={{
+            p: 3,
+            borderRadius: 2,
+            bgcolor: 'rgba(255, 255, 255, 0.9)',
+            width: '100%',
+            maxWidth: '800px',
+            margin: '0 auto'
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            {review.userName}
           </Typography>
-        )}
-      </Box>
+          <Typography color="primary" gutterBottom>
+            {'⭐'.repeat(review.rating)}
+          </Typography>
+          <Typography variant="body1">
+            {review.comment}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+            {new Date(review.date).toLocaleDateString()}
+          </Typography>
+        </Paper>
+      ))}
     </ReviewsContainer>
   );
 
@@ -1058,56 +1082,6 @@ export default function App() {
       icon: '🗑️'
     });
   };
-
-  // Add review dialog component
-  const renderReviewDialog = () => (
-    <Dialog 
-      open={reviewFormOpen} 
-      onClose={() => setReviewFormOpen(false)}
-      maxWidth="sm"
-      fullWidth
-    >
-      <DialogTitle>Write a Review</DialogTitle>
-      <DialogContent>
-        <Box component="form" onSubmit={handleReviewSubmit} sx={{ mt: 2 }}>
-          <TextField
-            fullWidth
-            label="Your Name"
-            value={newReview.userName}
-            onChange={(e) => setNewReview(prev => ({ ...prev, userName: e.target.value }))}
-            required
-            margin="normal"
-          />
-          <Box sx={{ mt: 2, mb: 1 }}>
-            <Typography gutterBottom>Rating</Typography>
-            <Select
-              value={newReview.rating}
-              onChange={(e) => setNewReview(prev => ({ ...prev, rating: e.target.value }))}
-              fullWidth
-            >
-              {[5, 4, 3, 2, 1].map((rating) => (
-                <MenuItem key={rating} value={rating}>{rating} Stars</MenuItem>
-              ))}
-            </Select>
-          </Box>
-          <TextField
-            fullWidth
-            label="Your Review"
-            value={newReview.comment}
-            onChange={(e) => setNewReview(prev => ({ ...prev, comment: e.target.value }))}
-            required
-            multiline
-            rows={4}
-            margin="normal"
-          />
-          <DialogActions>
-            <Button onClick={() => setReviewFormOpen(false)}>Cancel</Button>
-            <Button type="submit" variant="contained" color="primary">Submit Review</Button>
-          </DialogActions>
-        </Box>
-      </DialogContent>
-    </Dialog>
-  );
 
   return (
     <ThemeProvider theme={theme}>
@@ -1269,7 +1243,7 @@ export default function App() {
           </Grid>
 
           {/* Reviews Section */}
-          {renderReviews()}
+          <ReviewsSection />
           
           {/* Add Review Button */}
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 6 }}>
@@ -1285,7 +1259,7 @@ export default function App() {
           </Box>
           
           {/* Review Dialog */}
-          {renderReviewDialog()}
+          <ReviewDialog />
         
           {/* Cart Dialog */}
           <Dialog

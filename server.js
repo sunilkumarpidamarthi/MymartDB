@@ -463,76 +463,12 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 
-// Reviews API endpoints
-app.get('/api/reviews', async (req, res) => {
-  try {
-    const reviews = await Review.find().sort({ date: -1 });
-    console.log('Fetched reviews:', reviews);
-    
-    if (!reviews || reviews.length === 0) {
-      // If no reviews exist, create some sample reviews
-      const sampleReviews = [
-        {
-          userName: "John Doe",
-          rating: 5,
-          comment: "Great selection of Indian groceries! The prices are reasonable and the quality is excellent.",
-          date: new Date()
-        },
-        {
-          userName: "Sarah Smith",
-          rating: 4,
-          comment: "Love the variety of spices and lentils. Quick delivery and good packaging.",
-          date: new Date()
-        },
-        {
-          userName: "Raj Patel",
-          rating: 5,
-          comment: "Authentic Indian products at great prices. Will definitely shop again!",
-          date: new Date()
-        }
-      ];
-      
-      const createdReviews = await Review.insertMany(sampleReviews);
-      console.log('Created sample reviews:', createdReviews);
-      return res.json(createdReviews);
-    }
-    
-    res.json(reviews);
-  } catch (error) {
-    console.error('Error fetching reviews:', error);
-    res.status(500).json({ message: 'Error fetching reviews' });
-  }
-});
-
-app.post('/api/reviews', async (req, res) => {
-  try {
-    const { userName, rating, comment } = req.body;
-    
-    if (!userName || !rating || !comment) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-    
-    const newReview = new Review({
-      userName,
-      rating,
-      comment,
-      date: new Date()
-    });
-    
-    const savedReview = await newReview.save();
-    console.log('New review saved:', savedReview);
-    res.status(201).json(savedReview);
-  } catch (error) {
-    console.error('Error creating review:', error);
-    res.status(500).json({ message: 'Error creating review' });
-  }
-});
-
 // Get all reviews
 app.get('/api/reviews', async (req, res) => {
   try {
-    const reviews = await Review.find().sort({ timestamp: -1 }); // Get latest reviews first
-    console.log('Reviews fetched successfully:', reviews.length);
+    console.log('Fetching reviews...');
+    const reviews = await Review.find().sort({ date: -1 });
+    console.log('Reviews fetched:', reviews);
     res.json(reviews);
   } catch (error) {
     console.error('Error fetching reviews:', error);
@@ -543,22 +479,23 @@ app.get('/api/reviews', async (req, res) => {
   }
 });
 
-// Add new review
+// Add a new review
 app.post('/api/reviews', async (req, res) => {
+  const { userName, rating, comment } = req.body;
+  
   try {
-    const { userName, text } = req.body;
-    
-    if (!userName || !text) {
+    if (!userName || !rating || !comment) {
       return res.status(400).json({ 
         error: 'Missing required fields',
-        details: 'Please provide userName and text'
+        details: 'Please provide userName, rating, and comment'
       });
     }
 
     const newReview = new Review({
       userName,
-      text,
-      timestamp: new Date()
+      rating,
+      comment,
+      date: new Date()
     });
 
     const savedReview = await newReview.save();
