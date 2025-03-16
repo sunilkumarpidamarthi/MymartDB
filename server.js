@@ -32,10 +32,10 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/martdb', 
   console.error('MongoDB connection error:', error);
 });
 
-// Serve static files from the React app
-app.use(express.static('client/build'));
+// Serve static files from the client's build directory
+app.use(express.static(path.join(__dirname, 'client/build')));
 
-// Serve images
+// Serve product images
 app.use('/images', express.static(path.join(__dirname, 'client/public/images')));
 
 // Monitor MongoDB connection
@@ -894,9 +894,10 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// Handle React routing, return all requests to React app
+// All other GET requests not handled before will return React app
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+  console.log('Serving React app for path:', req.path);
+  res.sendFile(path.join(__dirname, 'client/build/index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
