@@ -1185,7 +1185,7 @@ export default function App() {
 
           <Box className="notification-bar">
             <MarqueeText>
-              🎉 Special Offer! Get 20% off on all items this weekend! | 🚚 Free delivery on orders above ₹500 | 🌟 New items added to our collection
+              🎉Welcome to Sunil's Mart Special Offer! Get 20% off on all items this weekend! | 🚚 Free delivery on orders above ₹500 | 🌟 New items added to our collection
             </MarqueeText>
           </Box>
 
