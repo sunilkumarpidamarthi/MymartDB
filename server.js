@@ -20,6 +20,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'build')));
 
 // MongoDB Connection with better error handling
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/martdb', {
@@ -326,6 +327,11 @@ const Product = mongoose.model('Product', productSchema);
  */
 
 // Get all products
+
+app.get('/',(req,res)=>{
+  res.sendFile(path.join(__dirname,'build','index.html'))
+})
+
 app.get('/api/products', async (req, res) => {
   try {
     const products = await Product.find();
